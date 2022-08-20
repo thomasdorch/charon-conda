@@ -5,3 +5,5 @@ Install from my Anaconda channel using:
 ```
 conda install -c thomasdorch charon
 ```
+
+This is a work-in-progress and I have only tested it on my machine (Debian 12), so any feedback is greatly appreciated! Eventually, I would to add this to conda-forge as well.
