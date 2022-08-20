@@ -1,0 +1,47 @@
+{% set version = "2.2" %}
+
+package:
+  name: charon
+  version: {{ version }}
+
+source:
+  url: https://www.sandia.gov/app/uploads/sites/106/2022/06/charon-distrib-v2_2.tar.gz
+  sha256: 2743f39fb14166091f1e38581f9d85379a7db178b4b2d4ce5c8411fdec727073
+  
+build:
+  number: 1
+  script_env:
+    TRIBITS_BASE_DIR
+
+requirements:
+  build:
+    - git
+    - make
+    - cmake >=3.10.0
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - {{ compiler('fortran') }}
+  host:
+    - python
+    - libblas
+    - liblapack
+    - openmpi
+    - boost-cpp 1.71
+    - netcdf-cxx4 4.3.1
+    - hdf5 1.10* mpi_openmpi_*
+    - zlib
+  run:
+    - openmpi
+    - boost-cpp
+    - libopenblas
+    - libnetcdf 4.7.4 mpi_openmpi_*
+    - hdf5 1.10* mpi_openmpi_*
+
+about:
+  home: https://charon.sandia.gov
+  license: GPL-3.0
+  license_file: LICENSE/Charon_LICENSE
+  summary:
+    TCAD simulation code from Sandia
+  description:
+    Charon is an open-source semiconductor device modeling code, widely referred to as a TCAD (technology computer-aided design) code, developed at Sandia National Laboratories.
