@@ -9,7 +9,8 @@ source:
   sha256: 2743f39fb14166091f1e38581f9d85379a7db178b4b2d4ce5c8411fdec727073
   
 build:
-  number: 1
+  number: 2
+  string: mpi_{{ mpi }}_py{{ py }}h{{ PKG_HASH }}
   script_env:
     TRIBITS_BASE_DIR
 
@@ -22,20 +23,20 @@ requirements:
     - {{ compiler('cxx') }}
     - {{ compiler('fortran') }}
   host:
-    - python
+    - python >=3.0.0
     - libblas
     - liblapack
-    - openmpi
+    - {{ mpi }}
     - boost-cpp 1.71
-    - netcdf-cxx4 4.3.1
-    - hdf5 1.10* mpi_openmpi_*
+    - netcdf-cxx4
+    - hdf5 * mpi_{{ mpi }}_*
     - zlib
   run:
-    - openmpi
+    - {{ mpi }}
     - boost-cpp
     - libopenblas
-    - libnetcdf 4.7.4 mpi_openmpi_*
-    - hdf5 1.10* mpi_openmpi_*
+    - libnetcdf * mpi_{{ mpi }}_*
+    - hdf5 * mpi_{{ mpi }}_*
 
 about:
   home: https://charon.sandia.gov

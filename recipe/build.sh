@@ -13,7 +13,6 @@ git clone https://github.com/Trilinos/Trilinos.git Trilinos
 # cd ..
 
 # Copied from Trilinos conda-feedstock (https://github.com/conda-forge/trilinos-feedstock)
-# Might be safe to delete some of these MPI_FLAGS lines...?
 mkdir -p build
 cd build
 
@@ -34,17 +33,20 @@ fi
 cmake \
   -D CMAKE_BUILD_TYPE:STRING=RELEASE \
   -D CMAKE_INSTALL_PREFIX:PATH=$PREFIX \
-  -D BUILD_SHARED_LIBS:BOOL=$SHARED_LIBS \
-  -D MPI_BASE_DIR:PATH=$PREFIX \
-  -D MPI_EXEC:FILEPATH=$PREFIX/bin/mpiexec \
-  -D PYTHON_EXECUTABLE:FILEPATH=$PYTHON \
   -D CMAKE_VERBOSE_MAKEFILE:BOOL=OFF \
   -D CMAKE_SKIP_RULE_DEPENDENCY:BOOL=ON \
   -D CMAKE_CXX_STANDARD:STRING=14 \
   -D CMAKE_FIND_NO_INSTALL_PREFIX:BOOL=ON \
-  -D tcad-charon_ENABLE_PyTrilinos:BOOL=OFF \
+  \
+  -D BUILD_SHARED_LIBS:BOOL=$SHARED_LIBS \
+  -D PYTHON_EXECUTABLE:FILEPATH=$PYTHON \
+  -D MPI_BASE_DIR:PATH=$PREFIX \
+  -D MPI_EXEC:FILEPATH=$PREFIX/bin/mpiexec \
+  \
   -D tcad-charon_TEST_CATEGORIES:STRING="HEAVY" \
   -D tcad-charon_VERBOSE_CONFIGURE:BOOL=OFF \
+  \
+  -D tcad-charon_ENABLE_PyTrilinos:BOOL=OFF \
   -D tcad-charon_ENABLE_Kokkos:BOOL=ON \
   -D tcad-charon_ENABLE_KokkosAlgorithms:BOOL=ON \
   -D tcad-charon_ENABLE_KokkosCore:BOOL=ON \
@@ -82,7 +84,8 @@ cmake \
   -D tcad-charon_ENABLE_Charon:BOOL=ON \
   -D Charon_ENABLE_TESTS:BOOL=ON \
   -D Charon_ENABLE_EXAMPLES:BOOL=ON \
-  -D Charon_ENABLE_DEBUG:BOOL=ON \
+  -D Charon_ENABLE_DEBUG:BOOL=OFF \
+  \
   -D TPL_ENABLE_MPI:BOOL=ON \
   -D TPL_ENABLE_Matio:BOOL=OFF \
   -D TPL_ENABLE_X11:BOOL=OFF \
@@ -90,6 +93,7 @@ cmake \
   -D TPL_ENABLE_Boost:BOOL=ON \
   -D TPL_ENABLE_BoostLib:BOOL=ON \
   -D TPL_ENABLE_Netcdf:BOOL=ON \
+  \
   -D AztecOO_ENABLE_TEUCHOS_TIME_MONITOR:BOOL=ON \
   -D Intrepid2_ENABLE_DEBUG_INF_CHECK:BOOL=OFF \
   -D SEACASExodus_ENABLE_MPI:BOOL=OFF \
@@ -99,9 +103,21 @@ cmake \
   -D Kokkos_ENABLE_CUDA:BOOL=OFF \
   -D Panzer_ENABLE_TESTS:BOOL=OFF \
   -D EpetraExt_ENABLE_HDF5:BOOL=OFF \
+  \
   -D GIT_EXECUTABLE:FILEPATH="$(which git)" \
   $SRC_DIR
 
-make -j $CPU_COUNT install
+# make -j $CPU_COUNT install
+make -j install
 
-# ctest -VV --output-on-failure -j${CPU_COUNT} ${SKIP}
+# ctest -VV --output-on-failure -j${CPU_COUNT}
+ctest --output-on-failure -j
+
+# Install charon Python files
+export PYTHON_LIBS_DIR=$(python3 -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')
+
+# remove python2 versions
+rm ${PREFIX}/lib/exodus2.py ${PREFIX}/lib/exomerge2.py
+
+# move python3 versions to site-packages
+mv ${PREFIX}/lib/exodus3.py ${PREFIX}/exodus3.py ${PREIFX}/charonInterpreter ${PYTHON_LIBS_DIR}
