@@ -12,8 +12,8 @@ build:
   number: 2
   string: mpi_{{ mpi }}_py{{ py }}h{{ PKG_HASH }}
   script_env:
-    MPI_IMPL={{ mpi }}
     TRIBITS_BASE_DIR
+    MPI_IMPL={{ mpi }}
 
 requirements:
   build:
@@ -24,20 +24,20 @@ requirements:
     - {{ compiler('cxx') }}
     - {{ compiler('fortran') }}
   host:
-    - python >=3.0.0
+    - python
     - libblas
     - liblapack
     - {{ mpi }}
     - boost-cpp 1.71
     - netcdf-cxx4
-    - hdf5 * mpi_{{ mpi }}_*
-    - zlib
+    - hdf5 1.12.1 mpi_{{ mpi }}_*
   run:
+    - python
     - {{ mpi }}
     - boost-cpp
     - libopenblas
     - libnetcdf * mpi_{{ mpi }}_*
-    - hdf5 * mpi_{{ mpi }}_*
+    - hdf5 1.12.1 mpi_{{ mpi }}_*
 
 about:
   home: https://charon.sandia.gov
