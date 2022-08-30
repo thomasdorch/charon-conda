@@ -29,6 +29,11 @@ if [ $(uname) == Linux ]; then
     export SHARED_LIBS=ON
 fi
 
+export MPICH_IGNORE_CXX_SEEK=OFF
+if [ $(MPI_IMPL) != "openmpi" ]; then
+    export MPICH_IGNORE_CXX_SEEK=ON
+fi
+
 # Collected from General.opts, sems-ppit-opt.opts, and Trilinos conda-feedstock
 cmake \
   -D CMAKE_BUILD_TYPE:STRING=RELEASE \
@@ -42,6 +47,7 @@ cmake \
   -D PYTHON_EXECUTABLE:FILEPATH=$PYTHON \
   -D MPI_BASE_DIR:PATH=$PREFIX \
   -D MPI_EXEC:FILEPATH=$PREFIX/bin/mpiexec \
+  -D MPICH_IGNORE_CXX_SEEK:BOOL=$MPICH_IGNORE_CXX_SEEK \
   \
   -D tcad-charon_TEST_CATEGORIES:STRING="HEAVY" \
   -D tcad-charon_VERBOSE_CONFIGURE:BOOL=OFF \
@@ -82,7 +88,7 @@ cmake \
   -D tcad-charon_ENABLE_DAKOTA_DRIVERS:BOOL=ON \
   -D tcad-charon_ENABLE_Epetra:BOOL=ON \
   -D tcad-charon_ENABLE_Charon:BOOL=ON \
-  -D Charon_ENABLE_TESTS:BOOL=ON \
+  -D Charon_ENABLE_TESTS:BOOL=OFF \
   -D Charon_ENABLE_EXAMPLES:BOOL=ON \
   -D Charon_ENABLE_DEBUG:BOOL=OFF \
   \
@@ -111,13 +117,17 @@ cmake \
 make -j install
 
 # ctest -VV --output-on-failure -j${CPU_COUNT}
-ctest --output-on-failure -j
 
 # Install charon Python files
-export PYTHON_LIBS_DIR=$(python3 -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')
+export PYTHON_LIBS_DIR=$(python -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')
 
 # remove python2 versions
 rm ${PREFIX}/lib/exodus2.py ${PREFIX}/lib/exomerge2.py
 
 # move python3 versions to site-packages
-mv ${PREFIX}/lib/exodus3.py ${PREFIX}/exodus3.py ${PREIFX}/charonInterpreter ${PYTHON_LIBS_DIR}
+mv \
+  ${PREFIX}/lib/exodus3.py \
+  ${PREFIX}/lib/exomerge3.py \
+  ${PREFIX}/charonInterpreter \
+  ${PREFIX}/Dakota \
+  ${PYTHON_LIBS_DIR}

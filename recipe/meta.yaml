@@ -12,6 +12,7 @@ build:
   number: 2
   string: mpi_{{ mpi }}_py{{ py }}h{{ PKG_HASH }}
   script_env:
+    MPI_IMPL={{ mpi }}
     TRIBITS_BASE_DIR
 
 requirements:
